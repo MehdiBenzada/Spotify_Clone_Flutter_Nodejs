@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "444866212667",
+    "project_id": "test-4cbff",
+    "storage_bucket": "test-4cbff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444866212667:android:2bdca32e4813500a42bd1e",
+        "android_client_info": {
+          "package_name": "com.example.firebase_tryout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbMK8cn7z7NgcIddsJvw_Yq5qfnLSvd9M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444866212667:android:d55bdfe0347ca0cc42bd1e",
+        "android_client_info": {
+          "package_name": "com.example.spotify_clone_fr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbMK8cn7z7NgcIddsJvw_Yq5qfnLSvd9M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
