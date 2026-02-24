@@ -1,11 +1,11 @@
  
 import 'package:flutter/material.dart';
  
-import 'package:spotify_clone_fr/core/api/api.dart';
-import 'package:spotify_clone_fr/features/music/models/Album.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
+import 'package:spotify_clone_fr/features/music/data/models/album.dart';
  
-import 'package:spotify_clone_fr/features/auth/model/shared_prefs.dart';
-import 'package:spotify_clone_fr/features/music/pages/songs.dart';
+import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 
 class search_Page extends StatefulWidget {
   const search_Page({super.key});
@@ -137,3 +137,4 @@ class _search_PageState extends State<search_Page> {
 
   
 }
+

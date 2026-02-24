@@ -5,11 +5,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:spotify_clone_fr/core/api/api.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
  
-import 'package:spotify_clone_fr/features/auth/model/shared_prefs.dart';
-import 'package:spotify_clone_fr/features/music/pages/home_page.dart';
-import 'package:spotify_clone_fr/features/other/pages/mainpage.dart';
+import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/home_page.dart';
+import 'package:spotify_clone_fr/features/other/presentation/views/pages/mainpage.dart';
 
 class UploadSong extends StatefulWidget {
   const UploadSong({super.key});
@@ -19,10 +19,10 @@ class UploadSong extends StatefulWidget {
 }
 
 class _UploadSongState extends State<UploadSong> {
-  late Future<String?> tokenFuture;
   bool isLoading = false;
   bool isSuccess = false;
   bool isError = false;
+  String? errorMessage;
   final TextEditingController artistController = TextEditingController();
   final TextEditingController songController = TextEditingController();
   final TextEditingController albumController = TextEditingController();
@@ -30,7 +30,6 @@ class _UploadSongState extends State<UploadSong> {
   @override
   void initState() {
     super.initState();
-    tokenFuture = shared_prefs().printToken();
   }
 
   Future<void> pickFile() async {
@@ -46,26 +45,35 @@ class _UploadSongState extends State<UploadSong> {
       print('File Path: ${file.path}');
 
       final uri = Uri.parse("http://10.0.2.2:3500/upload");
-      final token = await tokenFuture;
+      final token = await shared_prefs().printToken();
 
       setState(() {
         isLoading = true;
         isSuccess = false;
         isError = false;
+        errorMessage = null;
       });
 
       try {
+        if (token == null || token.isEmpty) {
+          setState(() {
+            isLoading = false;
+            isError = true;
+            errorMessage = "Missing token. Please login again.";
+          });
+          return;
+        }
+
         var request = http.MultipartRequest('POST', uri);
         request.headers['Authorization'] = 'Bearer $token';
 
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'filename',
-            File(file.path!).readAsBytesSync(),
-            filename: file.name,
-            contentType: MediaType('audio', 'mp3'),
-          ),
-        );
+        final bytes = file.bytes ?? File(file.path!).readAsBytesSync();
+        request.files.add(http.MultipartFile.fromBytes(
+          'filename',
+          bytes,
+          filename: file.name,
+          contentType: MediaType('audio', 'mp3'),
+        ));
 
         var streamedResponse = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
@@ -82,6 +90,7 @@ class _UploadSongState extends State<UploadSong> {
               setState(() {
                 isLoading = false;
                 isError = true;
+                errorMessage = "Fill album, song and artist fields first.";
               });
               return;
             }
@@ -98,9 +107,24 @@ class _UploadSongState extends State<UploadSong> {
 
             if (yurr != null) {
               print(yurr.body);
+              if (yurr.statusCode >= 400) {
+                setState(() {
+                  isLoading = false;
+                  isError = true;
+                  errorMessage =
+                      "Song metadata save failed (${yurr.statusCode}): ${yurr.body}";
+                });
+                return;
+              }
             }
           } catch (e) {
             print(e);
+            setState(() {
+              isLoading = false;
+              isError = true;
+              errorMessage = "Upload response parse error: $e";
+            });
+            return;
           }
 
           setState(() {
@@ -108,9 +132,19 @@ class _UploadSongState extends State<UploadSong> {
             isSuccess = true;
           });
         } else {
+          print("Upload failed: ${response.statusCode}");
+          print(response.body);
+          String message = "Upload failed (${response.statusCode}).";
+          try {
+            final body = jsonDecode(response.body);
+            if (body is Map && body['message'] != null) {
+              message = "${body['message']} (${response.statusCode})";
+            }
+          } catch (_) {}
           setState(() {
             isLoading = false;
             isError = true;
+            errorMessage = message;
           });
         }
 
@@ -119,6 +153,7 @@ class _UploadSongState extends State<UploadSong> {
         setState(() {
           isLoading = false;
           isError = true;
+          errorMessage = "Request error: $e";
         });
         print(e);
       }
@@ -130,6 +165,33 @@ class _UploadSongState extends State<UploadSong> {
   void goToHomePage() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => home_page()));
+  }
+
+  Future<void> checkUploadConnection() async {
+    final token = await shared_prefs().printToken();
+    if (token == null || token.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No token found. Login again first.")),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse("http://10.0.2.2:3500/upload/health"),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Health ${response.statusCode}: ${response.body}")),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Health check failed: $e")),
+      );
+    }
   }
 
   @override
@@ -184,6 +246,15 @@ class _UploadSongState extends State<UploadSong> {
               Column(
                 children: [
                   const Icon(Icons.error, color: Colors.red),
+                  if (errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
+                    ),
                   ElevatedButton(
                     onPressed: pickFile,  
                     child: const Text('Error! Try Again'),
@@ -195,6 +266,11 @@ class _UploadSongState extends State<UploadSong> {
                 onPressed: pickFile,
                 child: const Text('Choose Song'),
               ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: checkUploadConnection,
+              child: const Text('Check Upload Connection'),
+            ),
           ],
         ),
       ),
@@ -236,3 +312,4 @@ class TextBox extends StatelessWidget {
     );
   }
 }
+

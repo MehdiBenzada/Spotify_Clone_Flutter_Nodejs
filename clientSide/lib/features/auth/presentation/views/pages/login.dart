@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
  
-import 'package:spotify_clone_fr/core/api/api.dart';
-import 'package:spotify_clone_fr/features/auth/model/shared_prefs.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
+import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 
-import 'package:spotify_clone_fr/features/other/pages/mainpage.dart';
+import 'package:spotify_clone_fr/features/other/presentation/views/pages/mainpage.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -99,8 +99,8 @@ class _loginState extends State<login> {
                     final newBody = jsonDecode(response.body);
                     final String accessToken = newBody['accessToken'];
                     final String user = newBody['user'];
-                    shared_prefs().saveToken(accessToken);
-                    shared_prefs().saveUser(user);
+                    await shared_prefs().saveToken(accessToken);
+                    await shared_prefs().saveUser(user);
 
                     Navigator.push(
                       context,
@@ -133,3 +133,4 @@ class _loginState extends State<login> {
     );
   }
 }
+

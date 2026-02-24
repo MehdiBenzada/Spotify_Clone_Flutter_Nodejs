@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'package:spotify_clone_fr/features/music/models/Album.dart';
-import 'package:spotify_clone_fr/features/music/models/Song.dart';
+import 'package:spotify_clone_fr/features/music/data/models/album.dart';
+import 'package:spotify_clone_fr/features/music/data/models/song.dart';
 
 
 class SongPlayer extends StatefulWidget {
@@ -163,3 +163,4 @@ class Controls extends StatelessWidget {
     );
   }
 }
+

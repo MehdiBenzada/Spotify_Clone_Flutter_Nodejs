@@ -1,14 +1,14 @@
  
 
 import 'package:flutter/material.dart';
-import 'package:spotify_clone_fr/core/api/api.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 
-import 'package:spotify_clone_fr/features/auth/model/shared_prefs.dart';
+import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
  
 
-import 'package:spotify_clone_fr/features/music/models/Album.dart';
-import 'package:spotify_clone_fr/features/music/models/Song.dart';
-import 'package:spotify_clone_fr/features/music/pages/songplayer.dart';
+import 'package:spotify_clone_fr/features/music/data/models/album.dart';
+import 'package:spotify_clone_fr/features/music/data/models/song.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/songplayer.dart';
 
 class Songs extends StatefulWidget {
   const Songs({

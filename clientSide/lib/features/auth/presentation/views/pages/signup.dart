@@ -4,10 +4,10 @@
 import 'package:flutter/material.dart';
  
  
-import 'package:spotify_clone_fr/core/api/api.dart';
-import 'package:spotify_clone_fr/features/auth/model/user.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
+import 'package:spotify_clone_fr/features/auth/data/models/user.dart';
 
-import 'package:spotify_clone_fr/features/auth/view/pages/welcome.dart';
+import 'package:spotify_clone_fr/features/auth/presentation/views/pages/welcome.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -158,5 +158,6 @@ class SignupInput extends StatelessWidget {
     );
   }
 }
+
 
 

@@ -2,11 +2,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:spotify_clone_fr/core/api/api.dart';
-import 'package:spotify_clone_fr/features/auth/model/shared_prefs.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
+import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
  
-import 'package:spotify_clone_fr/features/music/pages/songs.dart';
-import 'package:spotify_clone_fr/features/music/models/Album.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
+import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 
 class liked_page extends StatefulWidget {
   const liked_page({super.key});
@@ -249,3 +249,4 @@ class _liked_pageState extends State<liked_page> {
 
   
 }
+

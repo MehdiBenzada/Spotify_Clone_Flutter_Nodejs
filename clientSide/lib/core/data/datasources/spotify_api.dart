@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:spotify_clone_fr/features/auth/model/shared_prefs.dart';
-import 'package:spotify_clone_fr/features/music/models/Album.dart';
-import 'package:spotify_clone_fr/features/music/models/Song.dart';
+import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
+import 'package:spotify_clone_fr/features/music/data/models/album.dart';
+import 'package:spotify_clone_fr/features/music/data/models/song.dart';
 
 class Spotify {
   static Future<String?> getToken() async {
@@ -75,9 +75,10 @@ class Spotify {
 
         String imageUrl = albumData['Photo'];
         print("Image URL before : $imageUrl");
-        imageUrl = '${imageUrl.replaceFirst('ibb.co', 'i.ibb.co')}/image.png';
-        print(
-            "Image URL after : $imageUrl"); // https://i.ibb.co/Wp59Jrp/image.png does this not work??
+        if (imageUrl.contains('ibb.co')) {
+          imageUrl = '${imageUrl.replaceFirst('ibb.co', 'i.ibb.co')}/image.png';
+        }
+        print("Image URL after : $imageUrl");
 
         return Album(
           // Include id if needed
@@ -232,3 +233,4 @@ class Spotify {
     }
   }
 }
+

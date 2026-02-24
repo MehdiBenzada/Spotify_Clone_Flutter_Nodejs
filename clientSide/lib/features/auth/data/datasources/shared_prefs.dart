@@ -1,28 +1,23 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class shared_prefs{
- 
-  void saveToken(String token) async {
-    SharedPreferences.setMockInitialValues({});
+class shared_prefs {
+  Future<void> saveToken(String token) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('token', token);
+    await prefs.setString('token', token);
   }
 
-  void saveUser(String user) async {
-    SharedPreferences.setMockInitialValues({});
+  Future<void> saveUser(String user) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('user', user);
+    await prefs.setString('user', user);
   }
+
   Future<String?> printToken() async {
-    
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
+
   Future<String?> printUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('user');
   }
-
- 
 }

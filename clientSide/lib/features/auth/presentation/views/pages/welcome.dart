@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:spotify_clone_fr/features/auth/view/pages/login.dart';
-import 'package:spotify_clone_fr/features/auth/view/pages/signup.dart';
+import 'package:spotify_clone_fr/features/auth/presentation/views/pages/login.dart';
+import 'package:spotify_clone_fr/features/auth/presentation/views/pages/signup.dart';
 
 class welcome extends StatelessWidget {
     welcome({super.key});
@@ -159,3 +159,4 @@ class auth_button extends StatelessWidget {
     );
   }
 }
+
