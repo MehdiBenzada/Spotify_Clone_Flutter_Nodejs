@@ -8,8 +8,8 @@ import 'package:http_parser/http_parser.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
  
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/home_page.dart';
-import 'package:spotify_clone_fr/features/other/presentation/views/pages/mainpage.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/homePage.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
 class UploadSong extends StatefulWidget {
   const UploadSong({super.key});
@@ -312,4 +312,5 @@ class TextBox extends StatelessWidget {
     );
   }
 }
+
 

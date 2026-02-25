@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 
-import 'package:spotify_clone_fr/features/other/presentation/views/pages/mainpage.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -97,6 +97,7 @@ class _loginState extends State<login> {
 
                   if (response.statusCode == 201) {
                     final newBody = jsonDecode(response.body);
+                    print(newBody);
                     final String accessToken = newBody['accessToken'];
                     final String user = newBody['user'];
                     await shared_prefs().saveToken(accessToken);
@@ -133,4 +134,5 @@ class _loginState extends State<login> {
     );
   }
 }
+
 

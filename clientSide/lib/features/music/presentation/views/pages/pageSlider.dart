@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_clone_fr/features/other/presentation/views/pages/liked.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/liked.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/search.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/home_page.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/homePage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -62,4 +62,5 @@ void main() {
     home: MainPage(),
   ));
 }
+
 

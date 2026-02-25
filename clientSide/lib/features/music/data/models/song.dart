@@ -12,6 +12,7 @@ class Song {
       artist: json['Artist'],
       image: json['Photo'],
       url: json['url']
+      
     );
   }
 }

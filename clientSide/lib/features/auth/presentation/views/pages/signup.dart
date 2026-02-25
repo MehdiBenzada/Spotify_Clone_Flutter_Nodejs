@@ -1,9 +1,4 @@
-
-
- 
 import 'package:flutter/material.dart';
- 
- 
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/models/user.dart';
 

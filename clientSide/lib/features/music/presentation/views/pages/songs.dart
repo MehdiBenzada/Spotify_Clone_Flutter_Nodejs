@@ -8,7 +8,7 @@ import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dar
 
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 import 'package:spotify_clone_fr/features/music/data/models/song.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/songplayer.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/songPlayer.dart';
 
 class Songs extends StatefulWidget {
   const Songs({

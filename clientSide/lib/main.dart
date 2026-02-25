@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify_clone_fr/features/auth/presentation/views/pages/login.dart';
 
 import 'package:spotify_clone_fr/features/auth/presentation/views/pages/welcome.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/home_page.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/homePage.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/upload.dart';
-import 'package:spotify_clone_fr/features/other/presentation/views/pages/liked.dart';
-import 'package:spotify_clone_fr/features/other/presentation/views/pages/mainpage.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/liked.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp( ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -27,4 +28,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
