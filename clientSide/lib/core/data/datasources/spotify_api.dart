@@ -25,9 +25,7 @@ class Spotify {
       List<Album> albums = jsonResponse.map((json) {
         String imageUrl = json['Photo'];
         // Update the image URL format
-        if (imageUrl.contains('ibb.co')) {
-          imageUrl = '${imageUrl.replaceFirst('ibb.co', 'i.ibb.co')}/image.png';
-        }
+        
         return Album(
           name: json['AlbumTitle'],
           artist: json['Artist'],
@@ -40,20 +38,7 @@ class Spotify {
     }
   }
 
-  static Future signIn(String email, password) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:3500/login'),
-        body: {"user": email, "pw": password},
-      );
-
-      return response;
-    } catch (e) {
-      print("Error: $e");
-      return null;
-    }
-  }
-
+ 
   static Future<Album?> fetchAlbums(String albumTitle) async {
     final token = await getToken();
     try {
@@ -92,15 +77,35 @@ class Spotify {
     }
     return null; // Return null if fetching fails
   }
+ static Future signIn(String email, password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:3500/login'),
+        body: {"user": email, "pw": password},
+      );
+
+      return response;
+    } catch (e) {
+      print("Error: $e");
+      return null;
+    }
+  }
 
   static Future signup(String user, String pw) async {
-    final response = await http.post(
+    try {
+       final response = await http.post(
       Uri.parse('http://10.0.2.2:3500/register'),
       body: {"user": user, "pw": pw},
+      
     );
 
     print(response.body);
-    print(response.statusCode);
+    print(response.statusCode); 
+    return response;
+    } catch (e) {
+      print(e); 
+    }
+   
   }
 
   static Future<bool> checkIfLiked(String albumTitle) async {

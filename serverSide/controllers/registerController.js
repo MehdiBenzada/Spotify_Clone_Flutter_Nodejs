@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../model/user');  
+const jwt = require('jsonwebtoken')
 
 const handleNewuser = async (req, res) => {
     const { user, pw } = req.body;
@@ -15,8 +16,10 @@ const handleNewuser = async (req, res) => {
             "password": hashedPW
         });
         console.log(result);
+        const accessToken = jwt.sign({ "username": user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+        const refreshToken = jwt.sign({ "username": user }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
 
-        res.status(201).json({ 'success': `new user ${user} created with success` });
+        res.status(201).json({ 'success': `new user ${user} created with success`,accessToken, user });
 
     } catch (err) {
         res.status(400).json({ 'message': err.message });

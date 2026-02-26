@@ -1,10 +1,9 @@
- 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
- 
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/logout.dart';
+
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 
@@ -43,38 +42,42 @@ class _liked_pageState extends State<liked_page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const Drawer(
+      drawer: Drawer(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.home),
               title: Text("Home"),
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.search),
               title: Text("Search"),
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.favorite),
               title: Text("Liked"),
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.settings),
               title: Text("Settings"),
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const logout()));
+              },
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
             )
           ],
         ),
       ),
       appBar: AppBar(
         leading: Container(),
-        backgroundColor: const Color(0xFF121212),  
+        backgroundColor: const Color(0xFF121212),
         toolbarHeight: 140,
         flexibleSpace: Builder(builder: (context) {
           return Column(
@@ -176,7 +179,7 @@ class _liked_pageState extends State<liked_page> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return const Text("");
+                    return const Text("Error");
                   }
                   return SizedBox(
                     height: 700,
@@ -246,7 +249,4 @@ class _liked_pageState extends State<liked_page> {
       ),
     );
   }
-
-  
 }
-

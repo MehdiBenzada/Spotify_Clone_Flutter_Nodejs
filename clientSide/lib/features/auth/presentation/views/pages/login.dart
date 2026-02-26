@@ -1,28 +1,31 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
- 
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
-
+import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
-class login extends StatefulWidget {
+class login extends ConsumerWidget {
   const login({super.key});
-
+  
   @override
-  State<login> createState() => _loginState();
-}
-
-Color newColor = const Color.fromARGB(255, 113, 103, 103);
-bool clicked = false;
-TextEditingController emailcontroller = TextEditingController();
-TextEditingController passwordcontroller = TextEditingController();
-
-class _loginState extends State<login> {
-  @override
-  Widget build(BuildContext context) {
+  
+  Widget build(BuildContext context, WidgetRef ref) {
+    Color newColor = const Color.fromARGB(255, 113, 103, 103);
+    bool clicked = false;
+    TextEditingController emailcontroller = TextEditingController();
+    TextEditingController passwordcontroller = TextEditingController();
+    ref.listen(authProvider,(previous, next) {
+      if(next.isSuccess){
+         Navigator.push(
+        context,
+      MaterialPageRoute(builder: (context) => const MainPage()));
+      }
+     
+    } ,);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -92,27 +95,10 @@ class _loginState extends State<login> {
                 onTap: () async {
                   final email = emailcontroller.text;
                   final pw = passwordcontroller.text;
-                  final response = await Spotify.signIn(email, pw);
-                  print(response.statusCode);
 
-                  if (response.statusCode == 201) {
-                    final newBody = jsonDecode(response.body);
-                    print(newBody);
-                    final String accessToken = newBody['accessToken'];
-                    final String user = newBody['user'];
-                    await shared_prefs().saveToken(accessToken);
-                    await shared_prefs().saveUser(user);
+                  ref.read(authProvider.notifier).login(email, pw);
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MainPage(),
-                      ),
-                    );
-                  } else {
-                    print('Login failed');
-                    print(response.body);
-                  }
+                  
                 },
                 child: Container(
                   padding: const EdgeInsets.only(
@@ -134,5 +120,3 @@ class _loginState extends State<login> {
     );
   }
 }
-
-

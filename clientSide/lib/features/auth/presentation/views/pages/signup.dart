@@ -1,50 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/models/user.dart';
-
-import 'package:spotify_clone_fr/features/auth/presentation/views/pages/welcome.dart';
-
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
-
-  @override
-  State<SignUp> createState() => _SignUpState();
-}
+import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
 TextEditingController textController = TextEditingController();
 User newUser = User(
   username: "",
   password: "",
 );
+final PageController signUpPageController = PageController();
 
-class _SignUpState extends State<SignUp> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0; 
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page!.toInt();
-      });
-    });
-  }
+class SignUp extends ConsumerWidget {
+  const SignUp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            if (_currentPage == 1) {
-             
-              _pageController.previousPage(
+            final currentPage = signUpPageController.hasClients
+                ? (signUpPageController.page ?? 0).round()
+                : 0;
+            if (currentPage == 1) {
+              signUpPageController.previousPage(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.ease,
               );
-            } else if (_currentPage == 0) {
-             
+            } else {
               Navigator.pop(context);
             }
           },
@@ -55,15 +40,15 @@ class _SignUpState extends State<SignUp> {
       ),
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
-        controller: _pageController,
+        controller: signUpPageController,
         children: [
           SignupInput(
             title: "username",
-            pageController: _pageController,
+            pageController: signUpPageController,
           ),
           SignupInput(
             title: "password",
-            pageController: _pageController,
+            pageController: signUpPageController,
           ),
         ],
       ),
@@ -71,7 +56,7 @@ class _SignUpState extends State<SignUp> {
   }
 }
 
-class SignupInput extends StatelessWidget {
+class SignupInput extends ConsumerWidget {
   const SignupInput({
     super.key,
     required this.title,
@@ -82,7 +67,14 @@ class SignupInput extends StatelessWidget {
   final PageController pageController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
+    ref.listen(authProvider,(previous, next) {
+      if(next.isSuccess){
+        Navigator.push(
+        context,
+      MaterialPageRoute(builder: (context) => const MainPage()));
+      }
+    },);
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
@@ -112,26 +104,17 @@ class SignupInput extends StatelessWidget {
           Center(
             child: GestureDetector(
               onTap: () async {
-                if (title != "last") {
-                  if (title == "username") {
-                    newUser.username = textController.text;
-                    textController.clear();
-                  } else {
-                    newUser.password = textController.text;
-                    Spotify.signup(newUser.username, newUser.password);
-                  }
+                if (title == "username") {
+                  newUser.username = textController.text;
+                  textController.clear();
                   pageController.nextPage(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.ease,
                   );
                 } else {
-                    Spotify.signup(newUser.username, newUser.password);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>   welcome(),
-                    ),
-                  );
+                  newUser.password = textController.text;
+                  ref.read(authProvider.notifier).signup(newUser.username, newUser.password); 
+                 
                 }
               },
               child: Container(
