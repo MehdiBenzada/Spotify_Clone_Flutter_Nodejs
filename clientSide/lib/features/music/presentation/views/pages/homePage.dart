@@ -1,38 +1,22 @@
- 
 import 'package:flutter/material.dart';
- 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
- 
+import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
+
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/upload.dart';
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 
-class home_page extends StatefulWidget {
+class home_page extends ConsumerWidget {
   const home_page({super.key});
-
   @override
-  State<home_page> createState() => _home_pageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final albumsState = ref.watch(albums_provider);
 
-class _home_pageState extends State<home_page> {
-  late Future<String?> tokenFuture;
-  late Future<String?> userFuture;
-  late Future<List<Album>> Albums;
-
-  @override
-  void initState() {
-    super.initState();
-
-    tokenFuture = shared_prefs().printToken();
-    userFuture = shared_prefs().printUser();
-    Albums = Spotify.getAlbums();  
- 
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -73,17 +57,12 @@ class _home_pageState extends State<home_page> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FutureBuilder(
-                future: userFuture,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  return Text(
-                    "Welcome ${snapshot.data}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 27,
-                    ),
-                  );
-                },
+              Text(
+                "Welcome ${ref.watch(authProvider).user}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 27,
+                ),
               ),
               const SizedBox(
                 height: 10,
@@ -91,74 +70,64 @@ class _home_pageState extends State<home_page> {
               SizedBox(
                 height: 200,
                 width: double.infinity,
-                child: FutureBuilder(
-                  future: Albums,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No albums available'));
-                    }
-
-                    List<Album> albums = snapshot.data!;
-
-                    return GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisExtent: 60,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        crossAxisCount: 2,
-                      ),
-                      itemCount: albums.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Album album = albums[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Songs(
-                                          album: album,
-                                        )));
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(3)),
-                                color: Color.fromARGB(74, 158, 158, 158)),
-                            child: Row(
-                              children: [
-                                Image.network(
-                                  album.image,
-                                  fit: BoxFit.fill,
-                                  width: 60, 
-                                  height: double
-                                      .infinity, 
+                child: albumsState.when(data: (albums) {
+                  return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisExtent: 60,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      crossAxisCount: 2,
+                    ),
+                    itemCount: albums.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      Album album = albums[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Songs(
+                                        album: album,
+                                      )));
+                        },
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(3)),
+                              color: Color.fromARGB(74, 158, 158, 158)),
+                          child: Row(
+                            children: [
+                              Image.network(
+                                album.image,
+                                fit: BoxFit.fill,
+                                width: 60,
+                                height: double.infinity,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  album.name,
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 17),
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    album.name,
-                                    softWrap: true,
-                                    overflow: TextOverflow.visible,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 17),
-                                  ),
-                                )
-                              ],
-                            ),
+                              )
+                            ],
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                        ),
+                      );
+                    },
+                  );
+                }, error: (e, st) {
+                  return const Center(child: Text("Error"));
+                }, loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                }),
               ),
               const SizedBox(
                 height: 30,
@@ -237,8 +206,6 @@ class _home_pageState extends State<home_page> {
       ),
     );
   }
-
- 
 }
 
 class appBar_container extends StatelessWidget {
@@ -260,4 +227,3 @@ class appBar_container extends StatelessWidget {
     );
   }
 }
-

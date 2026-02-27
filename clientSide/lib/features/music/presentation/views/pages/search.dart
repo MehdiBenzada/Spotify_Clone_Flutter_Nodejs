@@ -1,34 +1,27 @@
  
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
  
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
+import 'package:spotify_clone_fr/features/auth/data/providers/search_provider.dart';
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
  
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 
-class search_Page extends StatefulWidget {
+class search_Page extends ConsumerWidget {
   const search_Page({super.key});
 
-  @override
-  State<search_Page> createState() => _search_PageState();
-}
+ 
 
-class _search_PageState extends State<search_Page> {
+
+  @override
+  Widget build(BuildContext context,WidgetRef ref ) {
+    
   late Future<String?> tokenFuture;
   bool found = false;
   Album album = Album(name: "", artist: "", image: "");
   TextEditingController searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    tokenFuture =
-        shared_prefs().printToken(); 
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -55,6 +48,9 @@ class _search_PageState extends State<search_Page> {
               ),
               const SizedBox(height: 20),
               TextField(
+                onChanged: (value) {
+                  ref.read(searchProvider.notifier).state=value;
+                },
                 controller: searchController,
                 decoration: const InputDecoration(
                   hintText: "What do you want to listen to",
@@ -97,6 +93,7 @@ class _search_PageState extends State<search_Page> {
           ),
           if (found)
             GestureDetector(
+
               onTap: () {
                 Navigator.push(
                   context,

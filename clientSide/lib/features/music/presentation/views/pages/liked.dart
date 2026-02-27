@@ -1,46 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/logout.dart';
 
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 
-class liked_page extends StatefulWidget {
+class liked_page extends ConsumerWidget {
   const liked_page({super.key});
 
   @override
-  State<liked_page> createState() => _liked_pageState();
-}
-
-class _liked_pageState extends State<liked_page> {
-  late Future<String?> tokenFuture;
-  late Future<String?> usernameFuture;
-  late Future<List<Album>> albumsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    usernameFuture = shared_prefs().printUser();
-    tokenFuture = shared_prefs().printToken();
-    albumsFuture = Spotify.getAlbums();
-  }
-
-  @override
-  void didUpdateWidget(covariant liked_page oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    fetchAlbums();
-  }
-
-  void fetchAlbums() {
-    setState(() {
-      albumsFuture = Spotify.getAlbums();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
+  
+    final AlbumsState = ref.watch(albums_provider);
+  
     return Scaffold(
       drawer: Drawer(
         child: Column(
@@ -172,20 +148,12 @@ class _liked_pageState extends State<liked_page> {
               const SizedBox(
                 height: 10,
               ),
-              FutureBuilder(
-                future: albumsFuture,
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return const Text("Error");
-                  }
-                  return SizedBox(
+              AlbumsState.when(data: (albums){
+                return SizedBox(
                     height: 700,
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data.length,
+                      itemCount: albums.length,
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
                           onTap: () {
@@ -193,7 +161,7 @@ class _liked_pageState extends State<liked_page> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => Songs(
-                                          album: snapshot.data[index],
+                                          album: albums[index],
                                         )));
                           },
                           child: Padding(
@@ -206,7 +174,7 @@ class _liked_pageState extends State<liked_page> {
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
                                       image: NetworkImage(
-                                          snapshot.data[index].image),
+                                          albums[index].image),
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.circular(10),
@@ -219,7 +187,7 @@ class _liked_pageState extends State<liked_page> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      snapshot.data[index].name,
+                                      albums[index].name,
                                       style: const TextStyle(fontSize: 20),
                                     ),
                                     Row(
@@ -229,7 +197,7 @@ class _liked_pageState extends State<liked_page> {
                                           color: Colors.green,
                                         ),
                                         Text(
-                                            " Album by ${snapshot.data[index].artist}"),
+                                            " Album by ${albums[index].artist}"),
                                       ],
                                     )
                                   ],
@@ -241,8 +209,11 @@ class _liked_pageState extends State<liked_page> {
                       },
                     ),
                   );
-                },
-              ),
+              }, error: (error,st){
+                return Text("heyy");
+              }, loading: (){
+                return  const Center(child: CircularProgressIndicator());
+              })
             ],
           ),
         ),
