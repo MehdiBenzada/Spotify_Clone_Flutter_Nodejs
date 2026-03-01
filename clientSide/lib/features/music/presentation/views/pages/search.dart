@@ -49,7 +49,7 @@ class search_Page extends ConsumerWidget {
               const SizedBox(height: 20),
               TextField(
                 onChanged: (value) {
-                  ref.read(searchProvider.notifier).state=value;
+                  ref.read(searchProvider.notifier);
                 },
                 controller: searchController,
                 decoration: const InputDecoration(
@@ -84,14 +84,11 @@ class search_Page extends ConsumerWidget {
                 " this is the name ${album.name} ",
               );
 
-              setState(() {
-                found = true;
-                this.album = album;
-              });
+              
             },
             child: const Text("Search"),
           ),
-          if (found)
+        
             GestureDetector(
 
               onTap: () {
