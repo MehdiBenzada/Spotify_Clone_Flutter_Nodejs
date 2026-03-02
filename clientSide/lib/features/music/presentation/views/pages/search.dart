@@ -1,27 +1,15 @@
- 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
- 
-import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/search_provider.dart';
-import 'package:spotify_clone_fr/features/music/data/models/album.dart';
- 
-import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 
 class search_Page extends ConsumerWidget {
   const search_Page({super.key});
 
- 
-
-
   @override
-  Widget build(BuildContext context,WidgetRef ref ) {
-    
-  late Future<String?> tokenFuture;
-  bool found = false;
-  Album album = Album(name: "", artist: "", image: "");
-  TextEditingController searchController = TextEditingController();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchState = ref.watch(searchProvider);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -49,9 +37,8 @@ class search_Page extends ConsumerWidget {
               const SizedBox(height: 20),
               TextField(
                 onChanged: (value) {
-                  ref.read(searchProvider.notifier);
+                  ref.read(textProvider.notifier).state = value;
                 },
-                controller: searchController,
                 decoration: const InputDecoration(
                   hintText: "What do you want to listen to",
                   prefixIcon: Icon(
@@ -68,29 +55,12 @@ class search_Page extends ConsumerWidget {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          GestureDetector(
-            onTap: () async {
-              print("search button pressed");
-              String albumTitle = searchController.text.trim();
-
-              final album = await Spotify.fetchAlbums(albumTitle);
-              print("----------------------- below is album print");
-              print(
-                " this is the image ${album!.image} ",
-              );
-              print(
-                " this is the name ${album.name} ",
-              );
-
-              
-            },
-            child: const Text("Search"),
-          ),
-        
-            GestureDetector(
-
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: searchState.when(
+          data: (album) {
+            if (album == null) return const SizedBox();
+            return GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
@@ -102,33 +72,40 @@ class search_Page extends ConsumerWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    height: 200,
-                    width: 200,
+                    height: 100,
+                    width: 100,
                     child: Image.network(
                       album.image,
-                      fit: BoxFit.fill,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      album.name,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 17),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          album.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 17,
+                          ),
+                        ),
+                        Text(
+                          album.artist,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
-            )
-        ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, st) => const Center(child: Text("Album not found")),
+        ),
       ),
     );
   }
-
-  
 }
-
