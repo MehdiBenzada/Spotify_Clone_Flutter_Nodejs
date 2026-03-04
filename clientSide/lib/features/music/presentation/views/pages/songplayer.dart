@@ -1,20 +1,22 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 import 'package:spotify_clone_fr/features/music/data/models/song.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/player_provider.dart';
 
-
-class SongPlayer extends StatefulWidget {
-  const SongPlayer({super.key, required this.album, required this.song});
+class SongPlayer extends ConsumerStatefulWidget {
+   SongPlayer({super.key, required this.album, required this.song});
   final Song song;
   final Album album;
+  
 
   @override
-  State<SongPlayer> createState() => _SongPlayerState();
+  ConsumerState<SongPlayer> createState() => _SongPlayerState();
 }
 
 class PositionData {
@@ -25,33 +27,33 @@ class PositionData {
   PositionData(this.position, this.bufferedPosition, this.duration);
 }
 
-class _SongPlayerState extends State<SongPlayer> {
-  late AudioPlayer _audioPlayer;
+class _SongPlayerState extends ConsumerState<SongPlayer> {
+  late AudioPlayer audioPlayer;
+  
   Stream<PositionData> get _positiondataStream {
     return Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-      _audioPlayer.positionStream,
-      _audioPlayer.bufferedPositionStream,
-      _audioPlayer.durationStream,
+      audioPlayer.positionStream,
+      audioPlayer.bufferedPositionStream,
+      audioPlayer.durationStream,
       (position, bufferedPosition, duration) =>
           PositionData(position, bufferedPosition, duration ?? Duration.zero),
     );
   }
 
-  @override
+  @override 
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer()
-      ..setUrl(widget.song.url);  
+     audioPlayer = ref.read(PlayerProvider).audioPlayer;
+    ref.read(PlayerProvider.notifier).playSong();
+   
   }
 
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
+
+ 
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -82,8 +84,8 @@ class _SongPlayerState extends State<SongPlayer> {
               child: Image.network(
                 widget.album.image,
                 fit: BoxFit.fill,
-                width: 370, 
-                height: 370, 
+                width: 370,
+                height: 370,
               ),
             ),
             const SizedBox(
@@ -117,11 +119,11 @@ class _SongPlayerState extends State<SongPlayer> {
                   progress: positionData?.position ?? Duration.zero,
                   buffered: positionData?.bufferedPosition ?? Duration.zero,
                   total: positionData?.duration ?? Duration.zero,
-                  onSeek: _audioPlayer.seek,
+                  onSeek: audioPlayer.seek,
                 );
               },
             ),
-            Controls(audioPlayer: _audioPlayer),
+            Controls(audioPlayer: audioPlayer),
           ],
         ),
       ),
@@ -155,7 +157,7 @@ class Controls extends StatelessWidget {
           );
         } else {
           return const Icon(
-            Icons.play_arrow_rounded,
+            Icons.replay,
             size: 50,
           );
         }
@@ -163,4 +165,3 @@ class Controls extends StatelessWidget {
     );
   }
 }
-

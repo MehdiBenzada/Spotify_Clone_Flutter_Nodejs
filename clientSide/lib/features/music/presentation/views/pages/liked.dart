@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/logout.dart';
 
@@ -156,7 +157,9 @@ class liked_page extends ConsumerWidget {
                       itemCount: albums.length,
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
+                          
                           onTap: () {
+                           ref.watch(selectedAlbumProvider.notifier).state= albums[index].name;
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

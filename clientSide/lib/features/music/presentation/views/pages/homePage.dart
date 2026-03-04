@@ -5,6 +5,7 @@ import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
 
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
@@ -84,6 +85,7 @@ class home_page extends ConsumerWidget {
                       Album album = albums[index];
                       return GestureDetector(
                         onTap: () {
+                          ref.read(selectedAlbumProvider.notifier).state=album.name; 
                           Navigator.push(
                               context,
                               MaterialPageRoute(

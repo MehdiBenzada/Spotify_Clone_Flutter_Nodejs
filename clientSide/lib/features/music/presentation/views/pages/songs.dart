@@ -1,38 +1,38 @@
  
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 
-import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
  
 
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 import 'package:spotify_clone_fr/features/music/data/models/song.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songPlayer.dart';
 
-class Songs extends StatefulWidget {
+class Songs extends ConsumerStatefulWidget {
   const Songs({
     super.key,
     required this.album,
   });
   final Album album;
   @override
-  State<Songs> createState() => _SongsState();
+  ConsumerState<Songs> createState() => _SongsState();
 }
 
-class _SongsState extends State<Songs> {
-  late Future<String?> tokenFuture;
-  late Future<String?> usernameFuture;
-  late Future<List<Song>> songsFuture;
+class _SongsState extends ConsumerState<Songs> {
+
+
   bool isLiked = false;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    usernameFuture = shared_prefs().printUser();
-    tokenFuture = shared_prefs().printToken();
-    songsFuture = Spotify.getSongs(widget.album.name);
+    
+   
     checkInitialLikedStatus();
   }
 
@@ -171,53 +171,52 @@ class _SongsState extends State<Songs> {
               ),
             ),
           ),
-          FutureBuilder(
-            future: songsFuture,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              if (snapshot.hasError) {
-                return SliverFillRemaining(
-                  child: Text(
-                      "An error occurred and the error is ${snapshot.error}"),
-                );
-              }
-              if (snapshot.hasData) {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      final Song currentSong = snapshot.data[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SongPlayer(
-                                  album: widget.album,
-                                  song: currentSong,
-                                ),
-                              ));
-                        },
-                        child: ListTile(
-                          title: Text(currentSong.name,
-                              style: const TextStyle(color: Colors.white)),
-                          subtitle: Text(widget.album.artist,
-                              style: const TextStyle(color: Colors.white70)),
-                          trailing:
-                              const Icon(Icons.more_horiz, color: Colors.white),
-                        ),
-                      );
-                    },
-                    childCount: snapshot.data.length,
-                  ),
-                );
-              }
-              return Container();
-            },
-          ),
+          
+           ref.watch(albumSongsProvider).when(data:(data) {
+            return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final Song currentSong = data[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SongPlayer(
+                                    album: widget.album,
+                                    song: currentSong,
+                                  ),
+                                ));
+                          },
+                          child: ListTile(
+                            title: Text(currentSong.name,
+                                style: const TextStyle(color: Colors.white)),
+                            subtitle: Text(widget.album.artist,
+                                style: const TextStyle(color: Colors.white70)),
+                            trailing:
+                                const Icon(Icons.more_horiz, color: Colors.white),
+                          ),
+                        );
+                      },
+                      childCount: data.length,
+                    ),
+                  );
+
+
+
+
+
+             
+           } , error: (error, stackTrace) {
+              return SliverFillRemaining(
+                    child: Text(
+                        "An error occurred and the error is ${error}"),
+                  );
+           }, loading: () {
+             return const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+           },)
         ],
       ),
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
