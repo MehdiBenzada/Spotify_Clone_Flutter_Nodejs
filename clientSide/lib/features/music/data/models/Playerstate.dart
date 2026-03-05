@@ -5,5 +5,6 @@ class Playerstate {
   final Song? song;
   final AudioPlayer audioPlayer;
   final bool isPlaying;
-  Playerstate({required this.song, required this.audioPlayer, required this.isPlaying});
+  final String? currentSong;
+  Playerstate({required this.song, required this.audioPlayer, required this.isPlaying,required this.currentSong});
   }

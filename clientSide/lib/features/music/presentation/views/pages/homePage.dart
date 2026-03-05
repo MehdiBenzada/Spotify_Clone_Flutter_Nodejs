@@ -159,8 +159,8 @@ class home_page extends ConsumerWidget {
                                 image: AssetImage(
                                   "lib/core/assets/images/ds2.jpg",
                                 )),
-                            Text("Love Sicj (Deluxe)"),
-                            Text("Album by Don Toliver")
+                            Text("DS2 (Deluxe)"),
+                            Text("Album by Future")
                           ],
                         ),
                       ),
@@ -206,6 +206,7 @@ class home_page extends ConsumerWidget {
           ),
         ),
       ),
+      bottomNavigationBar:null ,
     );
   }
 }
