@@ -61,9 +61,11 @@ class _SongsState extends ConsumerState<Songs> {
             flexibleSpace: FlexibleSpaceBar(
               background: Image.network(
                 widget.album.image,
-                fit: BoxFit.fill,
-                width: 60,
-                height: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: Colors.grey[900],
+                  child: const Icon(Icons.album, color: Colors.white54, size: 80),
+                ),
               ),
             ),
             leading: IconButton(
@@ -126,6 +128,12 @@ class _SongsState extends ConsumerState<Songs> {
                           fit: BoxFit.cover,
                           width: 50,
                           height: 60,
+                          errorBuilder: (_, __, ___) => Container(
+                            width: 50,
+                            height: 60,
+                            color: Colors.grey[800],
+                            child: const Icon(Icons.album, color: Colors.white54),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 20),
@@ -184,7 +192,7 @@ class _SongsState extends ConsumerState<Songs> {
                         final Song currentSong = data[index];
                         return GestureDetector(
                           onTap: () {
-                            ref.read(PlayerProvider.notifier).playSong();
+                            ref.read(PlayerProvider.notifier).playSong(currentSong, data, index);
                           },
                           child: ListTile(
                             title: Text(currentSong.name,
@@ -236,7 +244,7 @@ class MiniPlayer extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        // TODO: open full player with showModalBottomSheet
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const SongPlayer()));
       },
       child: Container(
         height: 70,
@@ -252,10 +260,16 @@ class MiniPlayer extends ConsumerWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: Image.network(
-                "https://firebasestorage.googleapis.com/v0/b/spotify-8aec7.appspot.com/o/photos%2Fjl8brk6wsjr31.jpg?alt=media&token=a5a56939-7aae-4aaa-b59e-ce81c1cec6d5",
+                song.image,
                 width: 45,
                 height: 45,
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 45,
+                  height: 45,
+                  color: Colors.grey[800],
+                  child: const Icon(Icons.music_note, color: Colors.white54),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -266,7 +280,7 @@ class MiniPlayer extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Carousel",
+                    song.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -275,7 +289,7 @@ class MiniPlayer extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    "Travis Scott",
+                    song.artist,
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 12,

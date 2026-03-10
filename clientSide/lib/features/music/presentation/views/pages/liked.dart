@@ -5,6 +5,7 @@ import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
+import 'package:spotify_clone_fr/features/music/data/providers/liked_albums_provider.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/logout.dart';
 
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
@@ -16,7 +17,7 @@ class liked_page extends ConsumerWidget {
   @override
   Widget build(BuildContext context,WidgetRef ref) {
   
-    final AlbumsState = ref.watch(albums_provider);
+    final AlbumsState = ref.watch(likedAlbumsProvider);
   
     return Scaffold(
       drawer: Drawer(
@@ -171,39 +172,49 @@ class liked_page extends ConsumerWidget {
                             padding: const EdgeInsets.only(bottom: 15.0),
                             child: Row(
                               children: [
-                                Container(
-                                  height: 100,
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(
-                                          albums[index].image),
-                                      fit: BoxFit.cover,
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    albums[index].image,
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      height: 100,
+                                      width: 100,
+                                      color: Colors.grey[800],
+                                      child: const Icon(Icons.album, color: Colors.white54, size: 40),
                                     ),
-                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      albums[index].name,
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.download_for_offline_rounded,
-                                          color: Colors.green,
-                                        ),
-                                        Text(
-                                            " Album by ${albums[index].artist}"),
-                                      ],
-                                    )
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        albums[index].name,
+                                        style: const TextStyle(fontSize: 20),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.download_for_offline_rounded,
+                                            color: Colors.green,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              " Album by ${albums[index].artist}",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 )
                               ],
                             ),

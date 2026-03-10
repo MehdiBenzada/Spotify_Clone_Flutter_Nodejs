@@ -200,6 +200,36 @@ class Spotify {
     }
   }
 
+  static Future<List<Album>> getLikedAlbums() async {
+    final token = await getToken();
+    final username = await getUsername();
+    final uri = Uri.parse("http://10.0.2.2:3500/spotify/liked/albums");
+    try {
+      final response = await http.post(
+        uri,
+        body: {"username": username},
+        headers: {'authorization': 'Bearer $token'},
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonResponse = jsonDecode(response.body);
+        return jsonResponse
+            .map((json) => Album(
+                  name: json['AlbumTitle'],
+                  artist: json['Artist'],
+                  image: json['Photo'],
+                ))
+            .toList();
+      } else if (response.statusCode == 204) {
+        return [];
+      } else {
+        throw Exception('Failed to load liked albums');
+      }
+    } catch (e) {
+      print("Error fetching liked albums: $e");
+      return [];
+    }
+  }
+
   static Future add_song_to_album(
       String albumTitle, String name, String artist, String url) async {
     final token = await getToken();

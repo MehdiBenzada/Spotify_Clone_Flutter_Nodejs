@@ -100,11 +100,17 @@ class home_page extends ConsumerWidget {
                               color: Color.fromARGB(74, 158, 158, 158)),
                           child: Row(
                             children: [
-                              Image.network(
-                                album.image,
-                                fit: BoxFit.fill,
+                              SizedBox(
                                 width: 60,
-                                height: double.infinity,
+                                height: 60,
+                                child: Image.network(
+                                  album.image,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: Colors.grey[700],
+                                    child: const Icon(Icons.album, color: Colors.white54),
+                                  ),
+                                ),
                               ),
                               const SizedBox(
                                 width: 10,

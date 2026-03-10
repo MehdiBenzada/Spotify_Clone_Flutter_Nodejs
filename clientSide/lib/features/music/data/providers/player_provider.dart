@@ -1,32 +1,87 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:spotify_clone_fr/features/music/data/models/PlayerState.dart';
+import 'package:spotify_clone_fr/features/music/data/models/song.dart';
 
-final PlayerProvider = NotifierProvider<PlayerNotifier,Playerstate>((){
- return PlayerNotifier( );
+final PlayerProvider = NotifierProvider<PlayerNotifier, Playerstate>(() {
+  return PlayerNotifier();
 });
 
-class PlayerNotifier extends Notifier<Playerstate>{
-  
+class PlayerNotifier extends Notifier<Playerstate> {
   @override
   Playerstate build() {
-    return Playerstate(song: null, audioPlayer: AudioPlayer(), isPlaying: false,currentSong: null);
-    }
-  Future<void> playSong() async{
-    
-    await state.audioPlayer.setUrl( "https://firebasestorage.googleapis.com/v0/b/spotify-8aec7.appspot.com/o/files%2FTravis%20Scott%20-%20CAROUSEL%20(Audio).mp3%20%20%20%20%20%20%202026-2-24%202%3A20%3A49?alt=media&token=399caf08-64dd-4435-80f6-a75d0a3ce177");
-    
-     state = Playerstate(song: null, audioPlayer: state.audioPlayer, isPlaying: true,currentSong: "Carousel");
+    final player = AudioPlayer();
+    ref.onDispose(() => player.dispose());
+    return Playerstate(
+      currentSong: null,
+      queue: [],
+      currentIndex: 0,
+      audioPlayer: player,
+      isPlaying: false,
+    );
   }
-  Future<void> pauseSong() async{
-    state.audioPlayer.pause();
-    state= Playerstate(song: null, audioPlayer: state.audioPlayer, isPlaying: false,currentSong: "Carousel");
-  }
-  Future<void> resume() async{
-    state.audioPlayer.play();
-    state= Playerstate(song: null, audioPlayer:state.audioPlayer, isPlaying: true,currentSong: "Carousel");
-  }
-  
 
+  Future<void> playSong(Song song, List<Song> queue, int index) async {
+    await state.audioPlayer.setUrl(song.url);
+    await state.audioPlayer.play();
+    state = Playerstate(
+      currentSong: song,
+      queue: queue,
+      currentIndex: index,
+      audioPlayer: state.audioPlayer,
+      isPlaying: true,
+    );
+  }
+
+  Future<void> pauseSong() async {
+    await state.audioPlayer.pause();
+    state = Playerstate(
+      currentSong: state.currentSong,
+      queue: state.queue,
+      currentIndex: state.currentIndex,
+      audioPlayer: state.audioPlayer,
+      isPlaying: false,
+    );
+  }
+
+  Future<void> resume() async {
+    await state.audioPlayer.play();
+    state = Playerstate(
+      currentSong: state.currentSong,
+      queue: state.queue,
+      currentIndex: state.currentIndex,
+      audioPlayer: state.audioPlayer,
+      isPlaying: true,
+    );
+  }
+
+  Future<void> next() async {
+    final nextIndex = state.currentIndex + 1;
+    if (nextIndex >= state.queue.length) return;
+    final nextSong = state.queue[nextIndex];
+    await state.audioPlayer.setUrl(nextSong.url);
+    await state.audioPlayer.play();
+    state = Playerstate(
+      currentSong: nextSong,
+      queue: state.queue,
+      currentIndex: nextIndex,
+      audioPlayer: state.audioPlayer,
+      isPlaying: true,
+    );
+  }
+
+  Future<void> prev() async {
+    final prevIndex = state.currentIndex - 1;
+    if (prevIndex < 0) return;
+    final prevSong = state.queue[prevIndex];
+    await state.audioPlayer.setUrl(prevSong.url);
+    await state.audioPlayer.play();
+    state = Playerstate(
+      currentSong: prevSong,
+      queue: state.queue,
+      currentIndex: prevIndex,
+      audioPlayer: state.audioPlayer,
+      isPlaying: true,
+    );
+  }
 }

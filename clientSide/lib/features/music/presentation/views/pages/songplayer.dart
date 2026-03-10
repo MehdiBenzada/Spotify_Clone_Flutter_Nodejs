@@ -1,19 +1,13 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'package:spotify_clone_fr/features/music/data/models/album.dart';
-import 'package:spotify_clone_fr/features/music/data/models/song.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/player_provider.dart';
 
 class SongPlayer extends ConsumerStatefulWidget {
-   SongPlayer({super.key, required this.album, required this.song});
-  final Song song;
-  final Album album;
-  
+  const SongPlayer({super.key});
 
   @override
   ConsumerState<SongPlayer> createState() => _SongPlayerState();
@@ -29,7 +23,7 @@ class PositionData {
 
 class _SongPlayerState extends ConsumerState<SongPlayer> {
   late AudioPlayer audioPlayer;
-  
+
   Stream<PositionData> get _positiondataStream {
     return Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
       audioPlayer.positionStream,
@@ -40,20 +34,24 @@ class _SongPlayerState extends ConsumerState<SongPlayer> {
     );
   }
 
-  @override 
+  @override
   void initState() {
     super.initState();
-     audioPlayer = ref.read(PlayerProvider).audioPlayer;
-    ref.read(PlayerProvider.notifier).playSong();
-   
+    audioPlayer = ref.read(PlayerProvider).audioPlayer;
   }
-
-
- 
 
   @override
   Widget build(BuildContext context) {
-    
+    final playerState = ref.watch(PlayerProvider);
+    final song = playerState.currentSong;
+
+    if (song == null) {
+      return const Scaffold(
+        backgroundColor: Color.fromARGB(255, 24, 24, 24),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -66,7 +64,7 @@ class _SongPlayerState extends ConsumerState<SongPlayer> {
                 Navigator.of(context).pop();
               },
             ),
-            Text(widget.album.name),
+            const Text("Now Playing"),
             const Icon(Icons.more_horiz)
           ],
         ),
@@ -76,41 +74,37 @@ class _SongPlayerState extends ConsumerState<SongPlayer> {
         padding: const EdgeInsets.only(left: 23, right: 23),
         child: Column(
           children: [
-            const SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 50),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                widget.album.image,
+                song.image,
                 fit: BoxFit.fill,
                 width: 370,
                 height: 370,
               ),
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
             Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.song.name,
+                      song.name,
                       style: const TextStyle(
                           fontSize: 35, fontWeight: FontWeight.bold),
                     ),
-                    Text(widget.song.artist,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w300)),
+                    Text(
+                      song.artist,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w300),
+                    ),
                   ],
                 )
               ],
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
             StreamBuilder(
               stream: _positiondataStream,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -123,20 +117,34 @@ class _SongPlayerState extends ConsumerState<SongPlayer> {
                 );
               },
             ),
-            Controls(audioPlayer: audioPlayer),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.skip_previous, size: 40),
+                  onPressed: () => ref.read(PlayerProvider.notifier).prev(),
+                ),
+                const Controls(),
+                IconButton(
+                  icon: const Icon(Icons.skip_next, size: 40),
+                  onPressed: () => ref.read(PlayerProvider.notifier).next(),
+                ),
+              ],
+            ),
           ],
         ),
       ),
+      backgroundColor: const Color.fromARGB(255, 24, 24, 24),
     );
   }
 }
 
-class Controls extends StatelessWidget {
-  const Controls({super.key, required this.audioPlayer});
-  final AudioPlayer audioPlayer;
+class Controls extends ConsumerWidget {
+  const Controls({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final audioPlayer = ref.read(PlayerProvider).audioPlayer;
     return StreamBuilder<PlayerState>(
       stream: audioPlayer.playerStateStream,
       builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot) {
@@ -147,18 +155,18 @@ class Controls extends StatelessWidget {
           return IconButton(
             icon: const Icon(Icons.play_arrow),
             iconSize: 50,
-            onPressed: audioPlayer.play,
+            onPressed: () => ref.read(PlayerProvider.notifier).resume(),
           );
         } else if (processingState != ProcessingState.completed) {
           return IconButton(
             icon: const Icon(Icons.pause),
             iconSize: 50,
-            onPressed: audioPlayer.pause,
+            onPressed: () => ref.read(PlayerProvider.notifier).pauseSong(),
           );
         } else {
-          return const Icon(
-            Icons.replay,
-            size: 50,
+          return IconButton(
+            icon: const Icon(Icons.replay, size: 50),
+            onPressed: () => ref.read(PlayerProvider.notifier).resume(),
           );
         }
       },
