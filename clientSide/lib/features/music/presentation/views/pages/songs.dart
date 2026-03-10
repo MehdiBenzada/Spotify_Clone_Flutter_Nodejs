@@ -1,12 +1,8 @@
- 
-
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
-
- 
 
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 import 'package:spotify_clone_fr/features/music/data/models/song.dart';
@@ -18,7 +14,6 @@ import 'package:spotify_clone_fr/features/music/presentation/views/pages/songPla
 class Songs extends ConsumerStatefulWidget {
   const Songs({
     super.key,
-    
     required this.album,
   });
   final Album album;
@@ -27,16 +22,13 @@ class Songs extends ConsumerStatefulWidget {
 }
 
 class _SongsState extends ConsumerState<Songs> {
-
-  
   bool isLiked = false;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    
-   
+
     checkInitialLikedStatus();
   }
 
@@ -49,7 +41,6 @@ class _SongsState extends ConsumerState<Songs> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -64,7 +55,8 @@ class _SongsState extends ConsumerState<Songs> {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   color: Colors.grey[900],
-                  child: const Icon(Icons.album, color: Colors.white54, size: 80),
+                  child:
+                      const Icon(Icons.album, color: Colors.white54, size: 80),
                 ),
               ),
             ),
@@ -132,7 +124,8 @@ class _SongsState extends ConsumerState<Songs> {
                             width: 50,
                             height: 60,
                             color: Colors.grey[800],
-                            child: const Icon(Icons.album, color: Colors.white54),
+                            child:
+                                const Icon(Icons.album, color: Colors.white54),
                           ),
                         ),
                       ),
@@ -145,7 +138,8 @@ class _SongsState extends ConsumerState<Songs> {
                                   isLoading = true;
                                 });
                                 if (isLiked) {
-                                  await  Spotify.removeFromFavAlbum(widget.album.name);
+                                  await Spotify.removeFromFavAlbum(
+                                      widget.album.name);
                                 } else {
                                   await Spotify.addToFav(widget.album.name);
                                 }
@@ -184,54 +178,51 @@ class _SongsState extends ConsumerState<Songs> {
               ),
             ),
           ),
-          
-           ref.watch(albumSongsProvider).when(data:(data) {
-            return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        final Song currentSong = data[index];
-                        return GestureDetector(
-                          onTap: () {
-                            ref.read(PlayerProvider.notifier).playSong(currentSong, data, index);
-                          },
-                          child: ListTile(
-                            title: Text(currentSong.name,
-                                style: const TextStyle(color: Colors.white)),
-                            subtitle: Text(widget.album.artist,
-                                style: const TextStyle(color: Colors.white70)),
-                            trailing:
-                                const Icon(Icons.more_horiz, color: Colors.white),
-                          ),
-                        );
+          ref.watch(albumSongsProvider).when(
+            data: (data) {
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final Song currentSong = data[index];
+                    return GestureDetector(
+                      onTap: () {
+                        ref
+                            .read(PlayerProvider.notifier)
+                            .playSong(currentSong, data, index);
                       },
-                      childCount: data.length,
-                    ),
-                  );
-
-
-
-
-
-             
-           } , error: (error, stackTrace) {
+                      child: ListTile(
+                        title: Text(currentSong.name,
+                            style: const TextStyle(color: Colors.white)),
+                        subtitle: Text(widget.album.artist,
+                            style: const TextStyle(color: Colors.white70)),
+                        trailing:
+                            const Icon(Icons.more_horiz, color: Colors.white),
+                      ),
+                    );
+                  },
+                  childCount: data.length,
+                ),
+              );
+            },
+            error: (error, stackTrace) {
               return SliverFillRemaining(
-                    child: Text(
-                        "An error occurred and the error is ${error}"),
-                  );
-           }, loading: () {
-             return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-           },)
+                child: Text("An error occurred and the error is $error"),
+              );
+            },
+            loading: () {
+              return const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              );
+            },
+          )
         ],
       ),
       backgroundColor: const Color.fromARGB(255, 24, 24, 24),
-      bottomNavigationBar: MiniPlayer(),
+      bottomNavigationBar: const MiniPlayer(),
     );
   }
-
-  
 }
+
 class MiniPlayer extends ConsumerWidget {
   const MiniPlayer({super.key});
 
@@ -244,7 +235,22 @@ class MiniPlayer extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const SongPlayer()));
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const SongPlayer(),
+            transitionsBuilder: (_, animation, __, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+                child: child,
+              );
+            },
+          ),
+        );
       },
       child: Container(
         height: 70,

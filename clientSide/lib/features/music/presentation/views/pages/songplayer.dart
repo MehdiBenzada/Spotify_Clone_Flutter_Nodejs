@@ -59,7 +59,8 @@ class _SongPlayerState extends ConsumerState<SongPlayer> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon:
+                  const Icon(Icons.arrow_downward_rounded, color: Colors.white),
               onPressed: () {
                 Navigator.of(context).pop();
               },

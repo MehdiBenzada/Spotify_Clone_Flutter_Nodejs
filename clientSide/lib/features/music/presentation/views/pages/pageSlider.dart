@@ -4,6 +4,7 @@ import 'package:spotify_clone_fr/features/music/data/providers/liked_albums_prov
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/liked.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/search.dart';
 import 'package:spotify_clone_fr/features/music/presentation/views/pages/homePage.dart';
+import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -52,23 +53,26 @@ class _MainPageState extends ConsumerState<MainPage> {
         onPageChanged: _onPageChanged,
         children: _pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Liked"),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MiniPlayer(),
+          BottomNavigationBar(
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+              BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+              BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Liked"),
+            ],
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+          
+          ),
         ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
       ),
+      
     );
   }
 }
 
-void main() {
-  runApp(const MaterialApp(
-    home: MainPage(),
-  ));
-}
 
 
