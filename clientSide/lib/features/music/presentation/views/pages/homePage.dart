@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 
-import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
-
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/upload.dart';
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 
 class home_page extends ConsumerWidget {
@@ -30,10 +27,7 @@ class home_page extends ConsumerWidget {
             width: 10,
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const UploadSong()));
-            },
+            onTap: () => context.push('/upload'),
             child: const appBar_container(
               title: "All",
             ),
@@ -51,6 +45,12 @@ class home_page extends ConsumerWidget {
             title: "Podcasts",
           ),
         ]),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authProvider.notifier).logout(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -85,13 +85,8 @@ class home_page extends ConsumerWidget {
                       Album album = albums[index];
                       return GestureDetector(
                         onTap: () {
-                          ref.read(selectedAlbumProvider.notifier).state=album.name; 
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Songs(
-                                        album: album,
-                                      )));
+                          ref.read(selectedAlbumProvider.notifier).state = album.name;
+                          context.push('/songs', extra: album);
                         },
                         child: Container(
                           decoration: const BoxDecoration(

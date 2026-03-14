@@ -1,6 +1,8 @@
 # Claude Code
 .claude/
 CLAUDE.md
+go_router_plan.txt
+project_summary.txt
 
 # OS / Editor
 .DS_Store

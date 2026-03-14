@@ -22,15 +22,16 @@ class PlayerNotifier extends Notifier<Playerstate> {
   }
 
   Future<void> playSong(Song song, List<Song> queue, int index) async {
-    await state.audioPlayer.setUrl(song.url);
-    await state.audioPlayer.play();
+    final player = state.audioPlayer;
     state = Playerstate(
       currentSong: song,
       queue: queue,
       currentIndex: index,
-      audioPlayer: state.audioPlayer,
+      audioPlayer: player,
       isPlaying: true,
     );
+    await player.setUrl(song.url);
+    await player.play();
   }
 
   Future<void> pauseSong() async {

@@ -40,7 +40,7 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       state = AuthState(user: null, token: null, isLoading: true,isSuccess: false);
     final response = await Spotify.signup(username, pw);
-    
+
     final body= jsonDecode(response.body);
     final String accessToken = body['accessToken'];
     final String user = body['user'];
@@ -50,7 +50,12 @@ class AuthNotifier extends Notifier<AuthState> {
     } catch (e) {
       print(e);
     }
-   
+
   }
-  
+
+  Future<void> logout() async {
+    await shared_prefs().clearAll();
+    state = AuthState(user: null, token: null, isLoading: false, isSuccess: false);
+  }
+
 }

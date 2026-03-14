@@ -20,4 +20,10 @@ class shared_prefs {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('user');
   }
+
+  Future<void> clearAll() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('user');
+  }
 }

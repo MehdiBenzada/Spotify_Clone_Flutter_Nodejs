@@ -1,13 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import 'package:spotify_clone_fr/features/auth/presentation/views/pages/login.dart';
-import 'package:spotify_clone_fr/features/auth/presentation/views/pages/signup.dart';
+import 'package:go_router/go_router.dart';
 
 class welcome extends StatelessWidget {
-    welcome({super.key});
-  
+  welcome({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +23,6 @@ class welcome extends StatelessWidget {
               const SizedBox(
                 height: 15,
               ),
-
               const Text("Millions of songs.\n Free on Spotify.",
                   style: TextStyle(
                     fontSize: 30,
@@ -37,11 +32,8 @@ class welcome extends StatelessWidget {
                 height: 50,
               ),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) =>  SignUp(),));
-                },
+                onTap: () => context.push('/signup'),
                 child: Container(
-                  
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
@@ -60,11 +52,10 @@ class welcome extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),  
+              ),
               const SizedBox(
                 height: 10,
               ),
-
               const auth_button(
                 photo: "smartphone",
                 text: "Continue with phone number",
@@ -91,10 +82,7 @@ class welcome extends StatelessWidget {
                 text: "Continue with Apple",
               ),
               TextButton(
-                onPressed: () {
-                  print("Login button is pressed");
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const login(),));
-                },
+                onPressed: () => context.push('/login'),
                 child: const Text(
                   "Log in",
                   style: TextStyle(
@@ -159,4 +147,3 @@ class auth_button extends StatelessWidget {
     );
   }
 }
-

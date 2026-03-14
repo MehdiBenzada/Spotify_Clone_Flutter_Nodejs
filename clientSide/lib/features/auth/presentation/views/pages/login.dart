@@ -1,38 +1,27 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:spotify_clone_fr/features/auth/data/models/AuthState.dart';
 
-import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
-import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
 class login extends ConsumerWidget {
   const login({super.key});
-  
+
   @override
-  
   Widget build(BuildContext context, WidgetRef ref) {
     Color newColor = const Color.fromARGB(255, 113, 103, 103);
     bool clicked = false;
     TextEditingController emailcontroller = TextEditingController();
     TextEditingController passwordcontroller = TextEditingController();
-    ref.listen(authProvider,(previous, next) {
-      if(next.isSuccess){
-         Navigator.push(
-        context,
-      MaterialPageRoute(builder: (context) => const MainPage()));
-      }
-     
-    } ,);
+    ref.listen<AuthState>(authProvider, (_, next) {
+      if (next.isSuccess) context.go('/home');
+    });
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => context.pop(),
         ),
         title: const Row(
           children: [
@@ -95,10 +84,7 @@ class login extends ConsumerWidget {
                 onTap: () async {
                   final email = emailcontroller.text;
                   final pw = passwordcontroller.text;
-
                   ref.read(authProvider.notifier).login(email, pw);
-
-                  
                 },
                 child: Container(
                   padding: const EdgeInsets.only(

@@ -1,16 +1,14 @@
-  import 'dart:convert';
-  import 'dart:io';
+import 'dart:convert';
+import 'dart:io';
 
-  import 'package:file_picker/file_picker.dart';
-  import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-  import 'package:http/http.dart' as http;
-  import 'package:http_parser/http_parser.dart';
-  import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
-  
+import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
-  import 'package:spotify_clone_fr/features/music/presentation/views/pages/homePage.dart';
-  import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
   class UploadSong extends ConsumerStatefulWidget {
     const UploadSong({super.key});
@@ -164,8 +162,7 @@ import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart
     }
 
     void goToHomePage() {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => home_page()));
+      context.go('/home');
     }
 
     Future<void> checkUploadConnection() async {
@@ -201,14 +198,7 @@ import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart
         appBar: AppBar(
           automaticallyImplyLeading: false,
           leading: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MainPage(),
-                  ),
-                );
-              },
+              onPressed: () => context.pop(),
               icon: const Icon(Icons.arrow_back)),
           title: const Text('Upload Song'),
         ),

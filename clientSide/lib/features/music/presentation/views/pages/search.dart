@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/search_provider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 
 class search_Page extends ConsumerWidget {
   const search_Page({super.key});
@@ -63,14 +63,8 @@ class search_Page extends ConsumerWidget {
             if (album == null) return const SizedBox();
             return GestureDetector(
               onTap: () {
-                ref.watch(selectedAlbumProvider.notifier).state= album.name;
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Songs(album: album),
-                  ),
-                );
+                ref.read(selectedAlbumProvider.notifier).state = album.name;
+                context.push('/songs', extra: album);
               },
               child: Row(
                 children: [

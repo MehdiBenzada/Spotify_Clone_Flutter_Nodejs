@@ -1,6 +1,7 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
 
@@ -9,7 +10,6 @@ import 'package:spotify_clone_fr/features/music/data/models/song.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/player_provider.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/songPlayer.dart';
 
 class Songs extends ConsumerStatefulWidget {
   const Songs({
@@ -62,9 +62,7 @@ class _SongsState extends ConsumerState<Songs> {
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => context.pop(),
             ),
           ),
           SliverToBoxAdapter(
@@ -234,24 +232,7 @@ class MiniPlayer extends ConsumerWidget {
     if (song == null) return const SizedBox.shrink();
 
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const SongPlayer(),
-            transitionsBuilder: (_, animation, __, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeOut)),
-                child: child,
-              );
-            },
-          ),
-        );
-      },
+      onTap: () => context.push('/player'),
       child: Container(
         height: 70,
         decoration: BoxDecoration(

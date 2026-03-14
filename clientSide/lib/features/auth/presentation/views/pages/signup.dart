@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
+import 'package:go_router/go_router.dart';
+import 'package:spotify_clone_fr/features/auth/data/models/AuthState.dart';
+
 import 'package:spotify_clone_fr/features/auth/data/models/user.dart';
 import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
 
 TextEditingController textController = TextEditingController();
 User newUser = User(
@@ -30,7 +31,7 @@ class SignUp extends ConsumerWidget {
                 curve: Curves.ease,
               );
             } else {
-              Navigator.pop(context);
+              context.pop();
             }
           },
           icon: const Icon(Icons.arrow_back),
@@ -67,14 +68,10 @@ class SignupInput extends ConsumerWidget {
   final PageController pageController;
 
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
-    ref.listen(authProvider,(previous, next) {
-      if(next.isSuccess){
-        Navigator.push(
-        context,
-      MaterialPageRoute(builder: (context) => const MainPage()));
-      }
-    },);
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AuthState>(authProvider, (_, next) {
+      if (next.isSuccess) context.go('/home');
+    });
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
@@ -113,8 +110,9 @@ class SignupInput extends ConsumerWidget {
                   );
                 } else {
                   newUser.password = textController.text;
-                  ref.read(authProvider.notifier).signup(newUser.username, newUser.password); 
-                 
+                  ref
+                      .read(authProvider.notifier)
+                      .signup(newUser.username, newUser.password);
                 }
               },
               child: Container(
@@ -136,6 +134,3 @@ class SignupInput extends ConsumerWidget {
     );
   }
 }
-
-
-

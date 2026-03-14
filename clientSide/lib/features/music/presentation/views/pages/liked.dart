@@ -1,14 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spotify_clone_fr/core/data/datasources/spotify_api.dart';
-import 'package:spotify_clone_fr/features/auth/data/datasources/shared_prefs.dart';
+import 'package:go_router/go_router.dart';
+import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/albumSongsProvider.dart';
-import 'package:spotify_clone_fr/features/music/data/providers/albums_provider.dart';
 import 'package:spotify_clone_fr/features/music/data/providers/liked_albums_provider.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/logout.dart';
-
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/songs.dart';
 import 'package:spotify_clone_fr/features/music/data/models/album.dart';
 
 class liked_page extends ConsumerWidget {
@@ -43,10 +38,7 @@ class liked_page extends ConsumerWidget {
               title: Text("Settings"),
             ),
             ListTile(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const logout()));
-              },
+              onTap: () => ref.read(authProvider.notifier).logout(),
               leading: const Icon(Icons.logout),
               title: const Text("Logout"),
             )
@@ -160,13 +152,8 @@ class liked_page extends ConsumerWidget {
                         return GestureDetector(
                           
                           onTap: () {
-                           ref.watch(selectedAlbumProvider.notifier).state= albums[index].name;
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Songs(
-                                          album: albums[index],
-                                        )));
+                            ref.read(selectedAlbumProvider.notifier).state = albums[index].name;
+                            context.push('/songs', extra: albums[index]);
                           },
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 15.0),

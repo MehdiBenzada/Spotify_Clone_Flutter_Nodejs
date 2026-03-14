@@ -1,32 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spotify_clone_fr/features/auth/presentation/views/pages/login.dart';
-
-import 'package:spotify_clone_fr/features/auth/presentation/views/pages/welcome.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/homePage.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/upload.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/liked.dart';
-import 'package:spotify_clone_fr/features/music/presentation/views/pages/pageSlider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:spotify_clone_fr/core/router/app_router.dart';
+import 'package:spotify_clone_fr/features/auth/data/models/AuthState.dart';
+import 'package:spotify_clone_fr/features/auth/data/providers/auth_provider.dart';
 
 void main() {
-  runApp( ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class _RouterRefresh extends ChangeNotifier {
+  void refresh() => notifyListeners();
+}
+
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  late final _RouterRefresh _routerRefresh;
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _routerRefresh = _RouterRefresh();
+    _router = createRouter(ref, _routerRefresh);
+  }
+
+  @override
+  void dispose() {
+    _routerRefresh.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      // Only refresh the router for two cases:
+      // 1. Initial token load completed (not a login/signup)
+      if ((previous?.isLoading ?? true) && !next.isLoading && !next.isSuccess) {
+        _routerRefresh.refresh();
+      }
+      // 2. Logout (token cleared)
+      if (previous?.token != null && next.token == null && !next.isLoading) {
+        _routerRefresh.refresh();
+      }
+    });
+    return MaterialApp.router(
+      routerConfig: _router,
       title: 'Flutter Demo',
       theme: ThemeData(
           scaffoldBackgroundColor: const Color(0xFF121212),
           brightness: Brightness.dark,
           primaryColor: const Color.fromARGB(255, 24, 191, 29)),
-      home: welcome(),
     );
   }
 }
-
-
